@@ -7,6 +7,70 @@
   <meta name="description" content="Description">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
   <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
+  
+  <style>
+    /* 기존 스타일 */
+    .sidebar {
+      transition: transform 0.3s ease;
+    }
+    
+    .sidebar ul ul {
+      transition: all 0.3s ease;
+      max-height: 0;
+      overflow: hidden;
+    }
+    
+    .sidebar li.open > ul {
+      max-height: 1000px;
+    }
+    
+    .sidebar-nav li > p {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: normal !important;
+      overflow: visible !important;
+    }
+    
+    .sidebar-nav li > p::before {
+      content: '▶';
+      display: block;
+      transition: transform 0.3s ease;
+      font-size: 10px;
+      flex-shrink: 0;
+    }
+    
+    .sidebar-nav li.open > p::before {
+      transform: rotate(90deg);
+    }
+    
+    /* 비활성화된 항목 스타일 */
+    .sidebar-nav li.locked > p,
+    .sidebar-nav li.locked a {
+      color: #999 !important;
+      cursor: not-allowed !important;
+      position: relative;
+    }
+    
+    .sidebar-nav li.locked > p::after {
+      content: '🔒';
+      margin-left: 5px;
+    }
+    
+    .sidebar-nav li.locked {
+      pointer-events: none;
+      opacity: 0.6;
+    }
+    
+    /* Coming Soon 배지 */
+    .coming-soon {
+      font-size: 10px;
+      background: #f0f0f0;
+      padding: 2px 6px;
+      border-radius: 3px;
+      margin-left: 5px;
+    }
+  </style>
 </head>
 <body>
   <div id="app"></div>
@@ -15,11 +79,44 @@
       name: 'Ewha Lecture',
       repo: '',
       loadSidebar: true,
-      basePath: '/ewha/',
-      homepage: 'lecture_plan.md'
+      subMaxLevel: 2,
+      homepage: 'lecture_plan.md',
+      nameLink: "/",
+      plugins: [
+        function(hook, vm) {
+          hook.doneEach(function() {
+            // 토글 기능
+            document.querySelectorAll('.sidebar-nav li > p').forEach(function(p) {
+              if (p.nextElementSibling && p.nextElementSibling.tagName === 'UL') {
+                p.style.cursor = 'pointer';
+                p.addEventListener('click', function(e) {
+                  e.stopPropagation();
+                  const parent = p.parentElement;
+                  parent.classList.toggle('open');
+                });
+              }
+            });
+            
+            // Day 2, Day 3 비활성화
+            document.querySelectorAll('.sidebar-nav > ul > li').forEach(function(li) {
+              const text = li.textContent;
+              if (text.includes('Day 2') || text.includes('Day 3')) {
+                li.classList.add('locked');
+                // Coming Soon 텍스트 추가
+                const p = li.querySelector('p');
+                if (p && !p.querySelector('.coming-soon')) {
+                  const badge = document.createElement('span');
+                  badge.className = 'coming-soon';
+                  badge.textContent = 'Coming Soon';
+                  p.appendChild(badge);
+                }
+              }
+            });
+          });
+        }
+      ]
     }
   </script>
-  <!-- Docsify v4 -->
   <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
 </body>
 </html>
