@@ -80,23 +80,45 @@
       repo: '',
       loadSidebar: true,
       subMaxLevel: 2,
+      autoOpenSidebar: true,
       homepage: 'lecture_plan.md',
       nameLink: "/",
       plugins: [
         function(hook, vm) {
           hook.doneEach(function() {
+            
             // 토글 기능
-            document.querySelectorAll('.sidebar-nav li > p').forEach(function(p) {
-              if (p.nextElementSibling && p.nextElementSibling.tagName === 'UL') {
+            // document.querySelectorAll('.sidebar-nav li > p').forEach(function(p) {
+            //   if (p.nextElementSibling && p.nextElementSibling.tagName === 'UL') {
+            //     p.style.cursor = 'pointer';
+            //     p.addEventListener('click', function(e) {
+            //       e.stopPropagation();
+            //       const parent = p.parentElement;
+            //       parent.classList.toggle('open');
+            //     });
+            //   }
+            // });
+
+            document.querySelectorAll('.sidebar-nav li').forEach(function(li) {
+              const p = li.querySelector('p');
+
+              // <p>와 <ul>이 li 바로 아래에 있는지 확인
+              if (p && p.nextElementSibling && p.nextElementSibling.tagName === 'UL') {
                 p.style.cursor = 'pointer';
                 p.addEventListener('click', function(e) {
                   e.stopPropagation();
-                  const parent = p.parentElement;
-                  parent.classList.toggle('open');
+                  li.classList.toggle('open');
                 });
               }
+
+              // 이 li의 하위 요소 중에 .active 클래스가 있는지 확인
+              if (li.querySelector('.active')) {
+                li.classList.add('open');
+              }
             });
-            
+
+
+
             // Day 2, Day 3 비활성화
             document.querySelectorAll('.sidebar-nav > ul > li').forEach(function(li) {
               const text = li.textContent;
